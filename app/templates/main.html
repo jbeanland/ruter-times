@@ -1,0 +1,43 @@
+
+
+
+<script src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+<script>
+    $(function() {
+
+        $('#stop').on('change', function() {
+            $.post('/train_times/', {
+                stop_wanted: this.value
+            }).done(function(response) {
+                $('#test-output').text(response)
+            }).fail(function() {
+                $('#test-output').text("could not reach server")
+            })
+        })
+
+    });
+</script>
+
+
+<h1>Select Stop</h1>
+
+<form action="" method="post">
+
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.stop.label }}<br>
+        {{ form.stop() }}<br>
+        {% for error in form.stop.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+
+    <p>{{ form.submit() }}</p>
+
+</form>
+
+
+
+<div>
+    <p id='test-output'>Test Output</p>
+</div>
