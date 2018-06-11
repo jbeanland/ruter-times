@@ -23,6 +23,5 @@ def train_times():
 def get_stops():
     print('getting stops')
     choices = [{'stop_id': v, 'stop': k} for k, v in app.config['STOPS'].items()]
-    choices = sorted(choices, key=lambda k: k['stop_id'])
-    print(json.dumps(choices[:5]))
+    choices = sorted(choices, key=lambda k: k['stop'])
     return json.dumps(choices)
