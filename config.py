@@ -8,7 +8,7 @@ class Config(object):
         for i in range(1, 6):
             r = requests.get(f'https://reisapi.ruter.no/Line/GetStopsByLineID/{i}')
             k = r.json()
-            s = [x['Name'].strip(' [T-bane]') for x in k]
+            s = [x['Name'].split('[')[0].strip() for x in k]
             id_ = [x['ID'] for x in k]
             sid = dict(zip(s, id_))
             stops = {**stops, **sid}

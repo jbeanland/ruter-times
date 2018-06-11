@@ -73,9 +73,9 @@
     function get_correct_fav_button() {
         var stop_id = $('#select-stop').val();
         var selector = '#fav-button-' + stop_id;
-        // alert('where');
         $('#set-favourite').empty()
         $('#remove-favourite').empty()
+
         if ($(selector).length) {
             $('#remove-favourite').append("<button id='remove-favourite-button' class='btn btn-primary' type='submit'>Remove Favourite</button>")
 
@@ -145,11 +145,10 @@
             $.post('/set_favourite/', {
                 stop_id: stop_id
             }).done( function (data) {
-                data = JSON.parse(data)
+                data = JSON.parse(data)#
                 $('#favourites').append(add_favourite(data.stop_id, data.stop_name))
-            })
-            // alert('a')
-            get_correct_fav_button()
+                get_correct_fav_button()
+            });
         })
 
         // change data
@@ -162,8 +161,11 @@
             stop_id = $('#select-stop').val();
             var selector = '#fav-button-' + stop_id
             $(selector).remove();
-            $.post('/remove_favourite/', { stop_id: stop_id } );
-            get_correct_fav_button()
+            $.post('/remove_favourite/', {
+                stop_id: stop_id
+            }).done( function () {
+                get_correct_fav_button()
+            })
 
         })
 
@@ -180,10 +182,7 @@
             })
 
             get_favourites()
-            // alert('here')
             get_correct_fav_button()
-            // alert('there')
-
         })
     });
 </script>
