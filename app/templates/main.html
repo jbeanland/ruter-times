@@ -9,7 +9,18 @@
 
 <h1>Select Stop</h1>
 
+<div id='favourites'>
+</div>
+
+
 <select id="select-stop"></select>
+
+<div id='set-favourite'></div>
+<div id='remove-favourite'></div>
+
+
+
+
 
 <div id='results'>
 
@@ -22,8 +33,8 @@
 
 
 <script>
-    var globaldata = ''
 
+    // Add table to the dom for some platform
     function get_table(platform) {
         return `
         <table id='${platform}' class="table">
@@ -40,6 +51,7 @@
     `
     }
 
+    // Add a row to a table
     function get_row(line_num, destination, time_to_train) {
         return `
         <tr>
@@ -50,39 +62,112 @@
         `
     }
 
+    // Add a button for a favourite stop
+    function add_favourite (stop_id, stop_name) {
+        return `
+        <button id='fav-button-${stop_id}' class='btn btn-primary fav-button'>${stop_name}</button>
+        `
+    }
+
+    // Show either add or remove favourite, depending on current stop
+    function get_correct_fav_button() {
+        var stop_id = $('#select-stop').val();
+        var selector = '#fav-button-' + stop_id;
+        // alert('where');
+        $('#set-favourite').empty()
+        $('#remove-favourite').empty()
+        if ($(selector).length) {
+            $('#remove-favourite').append("<button id='remove-favourite-button' class='btn btn-primary' type='submit'>Remove Favourite</button>")
+
+        } else {
+            $('#set-favourite').append("<button id='set-favourite-button' class='btn btn-primary' type='submit'>Set Favourite</button>")
+        }
+
+    }
+
+
     $(function() {
-        $('#select-stop').on('change', function() {
+
+        // Get Train time data from stop_id
+        function fill_data(stop_id) {
             $.post('/train_times/', {
-                stop_wanted: this.value
+                stop_wanted: stop_id
             }).done(function(data) {
-                $('#results').empty()
+                // parse new data as JSON
                 data = JSON.parse(data)
-                globaldata = data
-                $('#test-output').text(data)
-                $('#test-stops').text(data["stop_info"]["stop_name"])
-                $('#test-also-stops').text(data.stop_info.platforms)
+                $('#results').empty()
                 var platforms = data.stop_info.platforms
                 var trains = data.result
 
+                // Add Platform tables
                 $.each(platforms, function (i, item) {
                     var platform = "platform-" + item.split(' ')[0]
                     $('#results').append("<div class='card w-75' id='card-" + platform + "'></div>")
                     $('#card-' + platform).append(get_table(platform))
-
                 })
+
+                // Add data to appropriate platform table
                 $.each(data.result, function (i, item) {
                     var platform = "#platform-" + item.platform.split(' ')[0]
                     $(platform).append(get_row(item.line_num, item.destination, item.time_away))
                 })
 
+                // if currently a favourite, button removes it as fav, else, adds as fav
+                get_correct_fav_button()
+
             }).fail(function() {
                 $('#test-output').text("could not reach server")
             })
+        }
+
+        // Get current list of favourites and create buttons
+        function get_favourites() {
+            biggerdata = []
+            $.getJSON('/get_favourites/', function (data) {
+                $('#favourites').empty()
+                $.each(data, function(i, item) {
+                    $('#favourites').append(add_favourite(item.stop_id, item.stop_name))
+                })
+            })
+        }
+
+        // when fav button clicked, update data
+        $('#favourites').on('click', '.btn', function () {
+            stop_id = this.id.split('-')[2]
+            $('#select-stop').val(stop_id)
+            fill_data(stop_id)
+
         })
 
+        // add to favourites and add button
+        $('#set-favourite').on('click','.btn', function () {
+            stop_id = $('#select-stop').val()
+            $.post('/set_favourite/', {
+                stop_id: stop_id
+            }).done( function (data) {
+                data = JSON.parse(data)
+                $('#favourites').append(add_favourite(data.stop_id, data.stop_name))
+            })
+            // alert('a')
+            get_correct_fav_button()
+        })
 
+        // change data
+        $('#select-stop').on('change', function () {
+            fill_data(this.value)
+        })
 
+        // update favourited and remove button
+        $('#remove-favourite').on('click', '.btn', function () {
+            stop_id = $('#select-stop').val();
+            var selector = '#fav-button-' + stop_id
+            $(selector).remove();
+            $.post('/remove_favourite/', { stop_id: stop_id } );
+            get_correct_fav_button()
 
+        })
+
+        // on startup, get list of stops, favourites, correct button
         $(document).ready(function () {
             let dropdown = $('#select-stop');
             var listitems = ''
@@ -93,6 +178,12 @@
                 });
                 $(dropdown).append(listitems)
             })
+
+            get_favourites()
+            // alert('here')
+            get_correct_fav_button()
+            // alert('there')
+
         })
     });
 </script>
