@@ -16,4 +16,6 @@ class Config(object):
         return stops, list_of_stops
 
     STOPS, LIST_OF_STOPS = get_stops()
+    STOPS_REV = {v: k for k, v in STOPS.items()}
+
     SECRET_KEY = 'a-terrible-secret-key'

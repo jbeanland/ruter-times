@@ -32,7 +32,11 @@ def format_train_times_results(r, minutes_in_results=30):
             time_away = '1 minute away'
         else:
             time_away = f'{mins_till_train} minutes away'
-        trains.append((line_num, destination, platform, time_away))
+        # trains.append((line_num, destination, platform, time_away))
+        trains.append({'line_num': line_num,
+                       'destination': destination,
+                       'platform': platform,
+                       'time_away': time_away})
 
     return trains
 
@@ -43,8 +47,18 @@ def get_trains(stop_wanted):
     if r.status_code == 200:
         k = r.json()
         train_times = format_train_times_results(k)
-        print(len(train_times), train_times[0])
+        return {'result': train_times,
+                'request_info': {'status_code': 200,
+                                 'time_of_request': datetime.now().strftime(strf_format),
+                                 },
+                'stop_info': {'stop_id': stop_wanted,
+                              'stop_name': app.config['STOPS_REV'][int(stop_wanted)],
+                              'platforms': sorted(list(set([x['platform'] for x in train_times]))),
+                              }
+                }
         return train_times
     else:
         print('failed')
-        return 'None'
+        return {'request_info': {'status_code': 400
+                                 }
+                }

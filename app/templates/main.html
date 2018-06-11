@@ -3,41 +3,69 @@
 
 <script src="//code.jquery.com/jquery-2.2.0.min.js"></script>
 <script>
-    $(function() {
+    var globaldata = ''
 
-        $('#stop').on('change', function() {
+    $(function() {
+        $('#select-stop').on('change', function() {
             $.post('/train_times/', {
                 stop_wanted: this.value
-            }).done(function(response) {
-                $('#test-output').text(response)
+            }).done(function(data) {
+                $('#results').empty()
+                data = JSON.parse(data)
+                globaldata = data
+                $('#test-output').text(data)
+                $('#test-stops').text(data["stop_info"]["stop_name"])
+                $('#test-also-stops').text(data.stop_info.platforms)
+                var platforms = data.stop_info.platforms
+                var trains = data.result
+
+                $.each(platforms, function (i, item) {
+                    var platform = "platform-" + item.split(' ')[0]
+                    // alert("platform-" + item.split(' ')[0])
+                    $('#results').append("<p id='" + platform + "'></p>")
+                    $('#' + platform).append(item + ":<br>")
+                })
+                $.each(data.result, function (i, item) {
+                    var platform = "#platform-" + item.platform.split(' ')[0]
+                    var content = item.line_num + ' | ' + item.destination + ' | ' + item.time_away
+                    $(platform).append(document.createTextNode(content))
+                    $(platform).append('<br>')
+                })
+
             }).fail(function() {
                 $('#test-output').text("could not reach server")
             })
         })
 
+
+
+
+        $(document).ready(function () {
+            let dropdown = $('#select-stop');
+            var listitems = ''
+            $.getJSON('/get_stops/', function (data) {
+                $.each(data, function (i, item) {
+                    listitem = '<option value=' + item.stop_id + '>' + item.stop + '</option>'
+                    listitems += listitem
+                });
+                $(dropdown).append(listitems)
+            })
+        })
     });
 </script>
 
 
 <h1>Select Stop</h1>
 
-<form action="" method="post">
+<select id="select-stop"></select>
 
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.stop.label }}<br>
-        {{ form.stop() }}<br>
-        {% for error in form.stop.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
+<div id='results'>
 
-    <p>{{ form.submit() }}</p>
-
-</form>
-
+</div>
 
 
 <div>
     <p id='test-output'>Test Output</p>
+    <p id = 'test-stops'>Test Stops</p>
+    <p id = 'test-also-stops'>Test Stops Also</p>
 </div>
