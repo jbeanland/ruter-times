@@ -1,1 +1,1 @@
-gunicorn ruter:app
+web: gunicorn ruter:app
