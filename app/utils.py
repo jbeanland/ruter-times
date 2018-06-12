@@ -24,6 +24,7 @@ def format_train_times_results(r, minutes_in_results=30):
         platform = x['MonitoredVehicleJourney']['MonitoredCall']['DeparturePlatformName']
         time_of_departure = x['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime']
         t = datetime.strptime(time_of_departure.split('+')[0], "%Y-%m-%dT%H:%M:%S")
+        print(f'train: {line_num}, {destination}, {platform}, {time_of_departure}, {(t-now).days}')
 
         if (t - now).days >= 0:
             mins_till_train = floor((t - now).seconds / 60)
@@ -46,7 +47,7 @@ def get_trains(stop_wanted):
     r = requests.get(q)
     if r.status_code == 200:
         k = r.json()
-        print(k)
+        # print(k)
         train_times = format_train_times_results(k)
         return {'result': train_times,
                 'request_info': {'status_code': 200,
