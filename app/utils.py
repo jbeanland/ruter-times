@@ -16,25 +16,19 @@ def format_train_times_results(r, minutes_in_results=30):
     now = datetime.now(pytz.timezone('Europe/Oslo'))
     # We don't want all trains, only the ones coming soon.
     cutoff = (now + timedelta(seconds=minutes_in_results * 60)).strftime(strf_format)
-    print(now, cutoff, 'new len(r): ', len(r))
-    print([(x['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime'], x['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime'] < cutoff) for x in r])
 
     # Filter for only those within the cutoff number of minutes.
     r = [x for x in r if x['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime'] < cutoff]
-    print('new len(r): ', len(r))
     for x in r:
         line_num = x['MonitoredVehicleJourney']['PublishedLineName']
         destination = x['MonitoredVehicleJourney']['DestinationName']
         platform = x['MonitoredVehicleJourney']['MonitoredCall']['DeparturePlatformName']
         time_of_departure = x['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime']
-        print(time_of_departure, time_of_departure.split('+')[0])
         try:
             t = datetime.strptime(time_of_departure.split('+')[0], "%Y-%m-%dT%H:%M:%S")
-            print(f't: {t}')
             t = pytz.timezone('Europe/Oslo').localize(t)
         except Exception:
             t = datetime.now(pytz.timezone('Europe/Oslo')) - timedelta(days=1)
-        # print(f'train: {line_num}, {destination}, {platform}, {time_of_departure}, {(t-now).days}')
 
         if (t - now).days >= 0:
             mins_till_train = floor((t - now).seconds / 60)
@@ -57,7 +51,6 @@ def get_trains(stop_wanted):
     r = requests.get(q)
     if r.status_code == 200:
         k = r.json()
-        print('in get_trains\n')
         train_times = format_train_times_results(k)
         return {'result': train_times,
                 'request_info': {'status_code': 200,
