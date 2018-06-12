@@ -12,7 +12,6 @@ def main():
 
 @app.route('/train_times/', methods=['POST'])
 def train_times():
-    # print('in train_times')
     trains = get_trains(int(request.form['stop_wanted']))
     return json.dumps(trains)
 

@@ -103,9 +103,11 @@ $(function() {
 
     // Get Train time data from stop_id
     function fill_data(stop_id) {
+        console.log('fill_data')
         $.post('/train_times/', {
             stop_wanted: stop_id
         }).done(function(data) {
+            console.log('in done in fill_data')
             // parse new data as JSON
             data = JSON.parse(data);
             $('#results').empty();
@@ -114,6 +116,7 @@ $(function() {
 
             // Add Platform tables
             $.each(platforms, function (i, item) {
+                console.log('item: ' + item)
                 var platform = "platform-" + item.split(' ')[0];
                 $('#results').append(get_card(platform, item));
             })
