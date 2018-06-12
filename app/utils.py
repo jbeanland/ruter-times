@@ -28,6 +28,7 @@ def format_train_times_results(r, minutes_in_results=30):
         platform = x['MonitoredVehicleJourney']['MonitoredCall']['DeparturePlatformName']
         time_of_departure = x['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime']
         t = datetime.strptime(time_of_departure.split('+')[0], "%Y-%m-%dT%H:%M:%S")
+        t = pytz.timezone('Europe/Oslo').localize(t)
         # print(f'train: {line_num}, {destination}, {platform}, {time_of_departure}, {(t-now).days}')
 
         if (t - now).days >= 0:
