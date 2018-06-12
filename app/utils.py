@@ -46,6 +46,7 @@ def get_trains(stop_wanted):
     r = requests.get(q)
     if r.status_code == 200:
         k = r.json()
+        print(k)
         train_times = format_train_times_results(k)
         return {'result': train_times,
                 'request_info': {'status_code': 200,
