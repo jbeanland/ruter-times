@@ -109,7 +109,9 @@ $(function() {
         }).done(function(data) {
             console.log('in done in fill_data')
             // parse new data as JSON
+            console.log(data)
             data = JSON.parse(data);
+            console.log(data)
             $('#results').empty();
             var platforms = data.stop_info.platforms;
             var trains = data.result;
