@@ -15,7 +15,7 @@ def format_train_times_results(r, minutes_in_results=30):
     trains = []
     now = datetime.now(pytz.timezone('Europe/Oslo'))
     # We don't want all trains, only the ones coming soon.
-    cutoff = (datetime.now() + timedelta(seconds=minutes_in_results * 60)).strftime(strf_format)
+    cutoff = (now + timedelta(seconds=minutes_in_results * 60)).strftime(strf_format)
     print(now, cutoff, 'new len(r): ', len(r))
     print([(x['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime'], x['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime'] < cutoff) for x in r])
 
