@@ -7,14 +7,6 @@ from app.utils import get_trains
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    # print('this is the main page')
-    # if 'user_favourite' in request.cookies:
-    #     favs = request.cookies['user_favourite']
-    #     print('favs:', favs)
-    # else:
-    #     print('no fav cookie')
-    #     # print(request.cookies)
-    # print('\n')
     return render_template('main.html', title='Landing')
 
 
@@ -27,7 +19,6 @@ def train_times():
 
 @app.route('/get_stops/')
 def get_stops():
-    # print('getting stops')
     choices = [{'stop_id': v, 'stop': k} for k, v in app.config['STOPS'].items()]
     choices = sorted(choices, key=lambda k: k['stop'])
     return json.dumps(choices)
@@ -37,7 +28,6 @@ def get_stops():
 def get_favourites():
     favs = request.cookies.get('user_favourite', '')
     if favs != '':
-        # print(favs)
         favs = request.cookies['user_favourite']
         favs = favs.split(',')
         favs = [{'stop_id': s, 'stop_name': app.config['STOPS_REV'][int(s)]} for s in favs]
@@ -65,7 +55,6 @@ def set_favourite():
 
 @app.route('/remove_favourite/', methods=['POST'])
 def remove_favourite():
-    # print('remove fav')
     stop_id = request.form['stop_id']
     response = current_app.make_response(redirect('/'))
     try:
@@ -77,6 +66,5 @@ def remove_favourite():
             existing = ','.join(existing)
     except (ValueError, AttributeError):
         existing = ''
-    # print(existing)
     response.set_cookie('user_favourite', value=existing)
     return response

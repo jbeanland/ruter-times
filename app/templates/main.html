@@ -1,189 +1,104 @@
-<head>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+<!DOCTYPE html>
+<html lang='en'>
 
+
+
+
+
+<head>
+    <meta charset="utf8">
+    <title>T-Bane Times</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/footer.css') }}">
 </head>
+
+
+
 
 <body>
 
+    <nav class="navbar navbar-expand-sm navbar-light bg-light">
+
+        <form class="form-inline m-2">
+            <div class="input-group">
+                    <select id="select-stop" class='custom-select'></select>
+                <div class="input-group-append">
+                    <button id='refresh-button' class="btn btn-outline-secondary" type="button"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </div>
+        </form>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav m-2">
+                <li class='nav-item active'>
+                    <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+
+                        <button id='set-favourite-button' class='btn btn-outline-secondary rounded-left' type='submit'><i class="fas fa-plus pr-1"></i></button>
+                        <button id='remove-favourite-button' class='btn btn-outline-secondary rounded-left d-none' type='submit'><i class="fas fa-minus pr-1"></i></button>
+
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupDrop1" type="button" class="btn btn-secondary rounded-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  Favourites
+                            </button>
+                            <div id='favourites' class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            </div>
+                        </div>
 
 
-<h1>Select Stop</h1>
+                    </div>
+                </li>
 
-<div id='favourites'>
-</div>
-
-
-<select id="select-stop"></select>
-
-<div id='set-favourite'></div>
-<div id='remove-favourite'></div>
+            </ul>
+        </div>
+    </nav>
 
 
 
+    <div class='container'>
+        <row id='results' class='card-deck'>
+
+        </row>
+    </div>
 
 
-<div id='results'>
 
-</div>
-
-
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-
-
-<script>
-
-    // Add table to the dom for some platform
-    function get_table(platform) {
-        return `
-        <table id='${platform}' class="table">
-          <thead>
-            <tr>
-              <th scope="col">Line</th>
-              <th scope="col">Destination</th>
-              <th scope="col">Time</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
-    `
-    }
-
-    // Add a row to a table
-    function get_row(line_num, destination, time_to_train) {
-        return `
-        <tr>
-          <td>${line_num}</td>
-          <td>${destination}</td>
-          <td>${time_to_train}</td>
-        </tr>
-        `
-    }
-
-    // Add a button for a favourite stop
-    function add_favourite (stop_id, stop_name) {
-        return `
-        <button id='fav-button-${stop_id}' class='btn btn-primary fav-button'>${stop_name}</button>
-        `
-    }
-
-    // Show either add or remove favourite, depending on current stop
-    function get_correct_fav_button() {
-        var stop_id = $('#select-stop').val();
-        var selector = '#fav-button-' + stop_id;
-        $('#set-favourite').empty()
-        $('#remove-favourite').empty()
-
-        if ($(selector).length) {
-            $('#remove-favourite').append("<button id='remove-favourite-button' class='btn btn-primary' type='submit'>Remove Favourite</button>")
-
-        } else {
-            $('#set-favourite').append("<button id='set-favourite-button' class='btn btn-primary' type='submit'>Set Favourite</button>")
-        }
-
-    }
+    <div class='container'>
+        <div class='card-deck'>
+            <div class="col-lg-4 col-md-6 col-xs-12">
+                <div class="card mb-4 shadow rounded border border-dark">
+                    <div class="card-header">
+                        Last Updated:
+                    </div>
+                    <div id='time-since-update' class="card-body">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-    $(function() {
 
-        // Get Train time data from stop_id
-        function fill_data(stop_id) {
-            $.post('/train_times/', {
-                stop_wanted: stop_id
-            }).done(function(data) {
-                // parse new data as JSON
-                data = JSON.parse(data)
-                $('#results').empty()
-                var platforms = data.stop_info.platforms
-                var trains = data.result
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">By Jack Beanland, 2018. Find it <a href="https://github.com/jbeanland/ruter-times">here</a></span>
+      </div>
+    </footer>
 
-                // Add Platform tables
-                $.each(platforms, function (i, item) {
-                    var platform = "platform-" + item.split(' ')[0]
-                    $('#results').append("<div class='card w-75' id='card-" + platform + "'></div>")
-                    $('#card-' + platform).append(get_table(platform))
-                })
 
-                // Add data to appropriate platform table
-                $.each(data.result, function (i, item) {
-                    var platform = "#platform-" + item.platform.split(' ')[0]
-                    $(platform).append(get_row(item.line_num, item.destination, item.time_away))
-                })
 
-                // if currently a favourite, button removes it as fav, else, adds as fav
-                get_correct_fav_button()
 
-            }).fail(function() {
-                $('#test-output').text("could not reach server")
-            })
-        }
 
-        // Get current list of favourites and create buttons
-        function get_favourites() {
-            biggerdata = []
-            $.getJSON('/get_favourites/', function (data) {
-                $('#favourites').empty()
-                $.each(data, function(i, item) {
-                    $('#favourites').append(add_favourite(item.stop_id, item.stop_name))
-                })
-            })
-        }
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
 
-        // when fav button clicked, update data
-        $('#favourites').on('click', '.btn', function () {
-            stop_id = this.id.split('-')[2]
-            $('#select-stop').val(stop_id)
-            fill_data(stop_id)
-
-        })
-
-        // add to favourites and add button
-        $('#set-favourite').on('click','.btn', function () {
-            stop_id = $('#select-stop').val()
-            $.post('/set_favourite/', {
-                stop_id: stop_id
-            }).done( function (data) {
-                data = JSON.parse(data)#
-                $('#favourites').append(add_favourite(data.stop_id, data.stop_name))
-                get_correct_fav_button()
-            });
-        })
-
-        // change data
-        $('#select-stop').on('change', function () {
-            fill_data(this.value)
-        })
-
-        // update favourited and remove button
-        $('#remove-favourite').on('click', '.btn', function () {
-            stop_id = $('#select-stop').val();
-            var selector = '#fav-button-' + stop_id
-            $(selector).remove();
-            $.post('/remove_favourite/', {
-                stop_id: stop_id
-            }).done( function () {
-                get_correct_fav_button()
-            })
-
-        })
-
-        // on startup, get list of stops, favourites, correct button
-        $(document).ready(function () {
-            let dropdown = $('#select-stop');
-            var listitems = ''
-            $.getJSON('/get_stops/', function (data) {
-                $.each(data, function (i, item) {
-                    listitem = '<option value=' + item.stop_id + '>' + item.stop + '</option>'
-                    listitems += listitem
-                });
-                $(dropdown).append(listitems)
-            })
-
-            get_favourites()
-            get_correct_fav_button()
-        })
-    });
-</script>
 </body>
+
+
+</html>

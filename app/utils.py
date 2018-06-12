@@ -25,18 +25,18 @@ def format_train_times_results(r, minutes_in_results=30):
         time_of_departure = x['MonitoredVehicleJourney']['MonitoredCall']['ExpectedDepartureTime']
         t = datetime.strptime(time_of_departure.split('+')[0], "%Y-%m-%dT%H:%M:%S")
 
-        mins_till_train = floor((t - now).seconds / 60)
-        if mins_till_train == 0:
-            time_away = 'now'
-        elif mins_till_train == 1:
-            time_away = '1 minute away'
-        else:
-            time_away = f'{mins_till_train} minutes away'
-        # trains.append((line_num, destination, platform, time_away))
-        trains.append({'line_num': line_num,
-                       'destination': destination,
-                       'platform': platform,
-                       'time_away': time_away})
+        if (t - now).days >= 0:
+            mins_till_train = floor((t - now).seconds / 60)
+            if mins_till_train == 0:
+                time_away = 'now'
+            elif mins_till_train == 1:
+                time_away = '1 minute away'
+            else:
+                time_away = f'{mins_till_train} minutes away'
+            trains.append({'line_num': line_num,
+                           'destination': destination,
+                           'platform': platform,
+                           'time_away': time_away})
 
     return trains
 
@@ -58,7 +58,6 @@ def get_trains(stop_wanted):
                 }
         return train_times
     else:
-        print('failed')
         return {'request_info': {'status_code': 400
                                  }
                 }
