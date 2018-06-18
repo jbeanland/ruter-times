@@ -20,7 +20,7 @@ def train_times():
 def get_stops():
     choices = [{'stop_id': v, 'stop': k} for k, v in app.config['STOPS'].items()]
     choices = sorted(choices, key=lambda k: k['stop'])
-    return json.dumps(choices)
+    return json.dumps(app.config['STOPS_REV'])
 
 
 @app.route('/get_favourites/')

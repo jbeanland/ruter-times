@@ -1,4 +1,6 @@
-var last_update = null
+var last_update = null;
+var stops = null;
+var stops_arr = null;
 
 // create a table in a card for a given platform at a station
 function get_card(platform, platform_full) {
@@ -136,12 +138,19 @@ $(function() {
 
     // Get current list of favourites and create buttons
     function get_favourites() {
-        biggerdata = []
-        $.getJSON('/get_favourites/', function (data) {
-            $('#favourites').empty()
-            $.each(data, function(i, item) {
-                $('#favourites').append(add_favourite(item.stop_id, item.stop_name))
-            })
+        favs = []
+
+        if (localStorage.getItem('fav')) {
+            favourites = localStorage.getItem('fav').split(',')
+        } else {
+            favourites = []
+        }
+
+        for (i in favourites) {
+            favs.push( {'stop_id' : favourites[i], 'stop_name': stops[favourites[i]]} )
+        }
+        $.each(favs, function(i, item) {
+            $('#favourites').append(add_favourite(item.stop_id, item.stop_name))
         })
     }
 
@@ -155,26 +164,38 @@ $(function() {
 
     // add to favourites and add button
     $('#set-favourite-button').on('click', function () {
-        stop_id = $('#select-stop').val()
-        $.post('/set_favourite/', {
-            stop_id: stop_id
-        }).done( function (data) {
-            data = JSON.parse(data)
-            $('#favourites').append(add_favourite(data.stop_id, data.stop_name))
-            get_correct_fav_button()
-        });
+        var stop_id = $('#select-stop').val();
+        if (localStorage.getItem('fav')) {
+            var favs = localStorage.getItem('fav') + ',' + stop_id
+        } else {
+            var favs = String(stop_id)
+        };
+        localStorage.setItem('fav', favs);
+
+        $('#favourites').append(add_favourite(stop_id, stops[stop_id]))
+        get_correct_fav_button()
     })
 
     // update favourited and remove button
     $('#remove-favourite-button').on('click', function () {
         stop_id = $('#select-stop').val();
+
+        if (localStorage.getItem('fav')) {
+            var favs = localStorage.getItem('fav').split(',')
+        } else {
+            var favs = []
+        };
+
+        ind = favs.indexOf(stop_id)
+        if (ind >= 0) {
+            favs.splice(ind, 1)
+            favs = favs.join(',')
+            localStorage.setItem('fav', favs)
+        };
+
         var selector = '#fav-button-' + stop_id
         $(selector).remove();
-        $.post('/remove_favourite/', {
-            stop_id: stop_id
-        }).done( function () {
-            get_correct_fav_button()
-        })
+        get_correct_fav_button();
 
     })
 
@@ -189,21 +210,50 @@ $(function() {
         fill_data(stop_id);
     })
 
+    function fillStopData(data) {
+        data_list = []
+        for (var k in data) {
+            data_list.push({'stop_id': k, 'stop_name': data[k]})
+        }
+        data_list.sort(function(a, b) {
+            return a['stop_name'].localeCompare(b['stop_name']);
+        });
+
+        stops = data;
+        stops_list = data_list;
+
+        let dropdown = $('#select-stop');
+        var listitems = '';
+        $.each(stops_list, function (i, item) {
+            listitem = '<option value=' + item.stop_id + '>' + item.stop_name + '</option>'
+            listitems += listitem
+        });
+
+        $(dropdown).append(listitems)
+    }
+
 
     // on startup, get list of stops, favourites, correct button
     $(document).ready(function () {
         let dropdown = $('#select-stop');
-        var listitems = ''
-        $.getJSON('/get_stops/', function (data) {
-            $.each(data, function (i, item) {
-                listitem = '<option value=' + item.stop_id + '>' + item.stop + '</option>'
-                listitems += listitem
-            });
-            $(dropdown).append(listitems)
-        })
+        var listitems = '';
+        var s = {};
+        var s_list = [];
 
-        get_favourites()
-        get_correct_fav_button()
+        if (localStorage.getItem('stops')) {
+            data = JSON.parse(localStorage.getItem('stops'));
+            fillStopData(data);
+            get_favourites();
+            get_correct_fav_button();
+        } else {
+            $.getJSON('/get_stops/', function (data) {
+                localStorage.setItem('stops', JSON.stringify(data));
+                fillStopData(data);
+                get_favourites();
+                get_correct_fav_button();
+            })
+        };
+
     })
 });
 
