@@ -3,25 +3,27 @@ var last_update = null
 // create a table in a card for a given platform at a station
 function get_card(platform, platform_full) {
     return `
-        <div class="col-lg-4 col-md-6 col-xs-12">
+        <div class="col-lg-6 col-md-12 col-xs-12 p-1">
             <div class="card mb-4 shadow rounded border border-dark">
                 <div class='card-header'>
-                    <p class="lead m-0">
+                    <p class="lead m-0"  style="text-align:center">
                         Platform ${platform_full}
                     </p>
                 </div>
-                <div class='card-body'>
-                    <table id='${platform}' class="table">
-                      <thead class='thead-dark'>
-                        <tr>
-                          <th>Line</th>
-                          <th>Destination</th>
-                          <th>Time</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                      </tbody>
-                    </table>
+                <div class='card-body p-2'>
+                    <div class="card m-0">
+                        <table id='${platform}' class="table">
+                          <thead class='thead-dark'>
+                            <tr>
+                              <th>Line</th>
+                              <th>Destination</th>
+                              <th>Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
