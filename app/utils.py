@@ -57,7 +57,7 @@ def get_trains(stop_wanted):
                                  'time_of_request': datetime.now().strftime(strf_format),
                                  },
                 'stop_info': {'stop_id': stop_wanted,
-                              'stop_name': app.config['STOPS_REV'][int(stop_wanted)],
+                              'stop_name': app.config['STOPS'][int(stop_wanted)],
                               'platforms': sorted(list(set([x['platform'] for x in train_times]))),
                               }
                 }

@@ -107,7 +107,7 @@ $(function() {
 
     // Get Train time data from stop_id
     function fill_data(stop_id) {
-        $.post('/train_times/', {
+        $.post('/GET/times/', {
             stop_wanted: stop_id
         }).done(function(data) {
             // parse new data as JSON
@@ -246,7 +246,7 @@ $(function() {
             get_favourites();
             get_correct_fav_button();
         } else {
-            $.getJSON('/get_stops/', function (data) {
+            $.getJSON('/GET/stops/', function (data) {
                 localStorage.setItem('stops', JSON.stringify(data));
                 fillStopData(data);
                 get_favourites();

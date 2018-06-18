@@ -10,12 +10,8 @@ class Config(object):
             k = r.json()
             s = [x['Name'].split('[')[0].strip() for x in k]
             id_ = [x['ID'] for x in k]
-            sid = dict(zip(s, id_))
+            sid = dict(zip(id_, s))
             stops = {**stops, **sid}
-        list_of_stops = sorted(list(set(stops)))
-        return stops, list_of_stops
+        return stops
 
-    STOPS, LIST_OF_STOPS = get_stops()
-    STOPS_REV = {v: k for k, v in STOPS.items()}
-
-    SECRET_KEY = 'a-terrible-secret-key'
+    STOPS = get_stops()
