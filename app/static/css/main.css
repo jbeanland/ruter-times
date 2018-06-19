@@ -29,3 +29,16 @@ body {
 .timer-deck {
     max-width: 400px;
 }
+
+/* Window Resize
+-------------------------------- */
+
+@media screen and (min-height: 820px) /* height >= 820 px */
+{
+    .footer {
+        position: absolute;
+          bottom: 3px;
+          left: 0px;
+        /* more styles */
+    }
+}
