@@ -5,7 +5,7 @@ var stops_arr = null;
 // create a table in a card for a given platform at a station
 function get_card(platform, platform_full) {
     return `
-        <div class="col-lg-6 col-md-12 col-xs-12 p-1">
+        <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-xs-12 p-1">
             <div class="card mb-4 shadow rounded border border-dark">
                 <div class='card-header'>
                     <p class="lead m-0"  style="text-align:center">
