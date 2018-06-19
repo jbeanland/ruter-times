@@ -1,8 +1,8 @@
-# A Simple Page for upcoming T-Bane Times
+# A Simple Page for upcoming T-Bane and Bus Times
 
-Using the [open api from Ruter Labs](https://reisapi.ruter.no/help), this is a simple mobile-first webpage to get the train times for a t-bane stop in Oslo.
+Using the [open api from Ruter Labs](https://reisapi.ruter.no/help), this is a simple mobile-first webpage to get upcoming times for buses or the T-bane in Oslo.
 
-It separates out by platform and saves favourite locations.
+Input by autocompleting stop name, favourites saved with HTML5 localStorage.
 
 Made with Flask and Bootstrap 4.
 
