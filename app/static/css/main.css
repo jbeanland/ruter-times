@@ -30,15 +30,35 @@ body {
     max-width: 400px;
 }
 
-/* Window Resize
+.header-img {
+  height: 30px;
+}
+
+#navbar-brand {
+  max-width: 38px;
+}
+
+
+/* Custom navbar breakpoint
 -------------------------------- */
 
-@media screen and (min-height: 820px) /* height >= 820 px */
-{
-    .footer {
-        position: absolute;
-          bottom: 3px;
-          left: 0px;
-        /* more styles */
+@media (min-width: 350px){
+    .navbar-expand-custom {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+    }
+    .navbar-expand-custom .navbar-nav {
+        flex-direction: row;
+    }
+    .navbar-expand-custom .navbar-nav .nav-link {
+        padding-right: .5rem;
+        padding-left: .5rem;
+    }
+    .navbar-expand-custom .navbar-collapse {
+        display: flex!important;
+    }
+    .navbar-expand-custom .navbar-toggler {
+        display: none;
     }
 }
