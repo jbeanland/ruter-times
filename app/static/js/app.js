@@ -1,6 +1,11 @@
+
+$(function() {
+
 var last_update = null;
 var stops = null;
-var stops_arr = null;
+var stops_arr = [];
+var current_stop = {'stop_id': 0, 'stop_name': ''};
+
 
 // create a table in a card for a given platform at a station
 function get_card(platform, platform_full) {
@@ -54,7 +59,7 @@ function add_favourite (stop_id, stop_name) {
 
 // Show either add or remove favourite, depending on current stop
 function get_correct_fav_button() {
-    var stop_id = $('#select-stop').val();
+    var stop_id = current_stop.stop_id;
     var selector = '#fav-button-' + stop_id;
 
     if ($(selector).length) {
@@ -103,10 +108,10 @@ var format_time = function () {
 }
 
 
-$(function() {
 
     // Get Train time data from stop_id
-    function fill_data(stop_id) {
+    function fill_data() {
+        var stop_id = current_stop.stop_id
         $.post('/GET/times/', {
             stop_wanted: stop_id
         }).done(function(data) {
@@ -133,6 +138,11 @@ $(function() {
 
             last_update = new Date();
 
+
+
+            $('#text-entry').attr("placeholder", current_stop.stop_name);
+            $('#text-entry').val('');
+
         })
     }
 
@@ -157,14 +167,22 @@ $(function() {
     // when fav button clicked, update data
     $('#favourites').on('click', '.btn', function () {
         stop_id = this.id.split('-')[2]
-        $('#select-stop').val(stop_id)
-        fill_data(stop_id)
+        id_ = this.id;
+        stop_name = $(this).text();
+
+        current_stop = {'stop_id': stop_id, 'stop_name': stop_name};
+
+
+
+        // $('#select-stop').val(stop_id)
+        $('#text-entry').val(stops[stop_id])
+        fill_data()
 
     })
 
     // add to favourites and add button
     $('#set-favourite-button').on('click', function () {
-        var stop_id = $('#select-stop').val();
+        var stop_id = current_stop.stop_id;
         if (localStorage.getItem('fav')) {
             var favs = localStorage.getItem('fav') + ',' + stop_id
         } else {
@@ -178,7 +196,7 @@ $(function() {
 
     // update favourited and remove button
     $('#remove-favourite-button').on('click', function () {
-        stop_id = $('#select-stop').val();
+        stop_id = current_stop.stop_id;
 
         if (localStorage.getItem('fav')) {
             var favs = localStorage.getItem('fav').split(',')
@@ -199,37 +217,24 @@ $(function() {
 
     })
 
-    // change data
-    $('#select-stop').on('change', function () {
-        fill_data(this.value)
-    })
-
     // refresh data on button click
     $('#refresh-button').on('click', function () {
-        var stop_id = $('#select-stop').val();
-        fill_data(stop_id);
+        fill_data();
     })
 
     function fillStopData(data) {
         data_list = []
         for (var k in data) {
-            data_list.push({'stop_id': k, 'stop_name': data[k]})
+            data_list.push({'value': k, 'label': data[k]})
         }
         data_list.sort(function(a, b) {
-            return a['stop_name'].localeCompare(b['stop_name']);
+            return a['label'].localeCompare(b['label']);
         });
 
         stops = data;
-        stops_list = data_list;
+        stops_arr = data_list;
 
-        let dropdown = $('#select-stop');
-        var listitems = '';
-        $.each(stops_list, function (i, item) {
-            listitem = '<option value=' + item.stop_id + '>' + item.stop_name + '</option>'
-            listitems += listitem
-        });
 
-        $(dropdown).append(listitems)
     }
 
 
@@ -251,10 +256,53 @@ $(function() {
                 fillStopData(data);
                 get_favourites();
                 get_correct_fav_button();
+
             })
         };
 
-    })
+    });
+
+    var accentMap = {
+          "á": "a",
+          "ö": "o",
+          "ť": "t",
+          "ø": "o",
+          "Ø": "o",
+          "æ": "ae",
+          "Æ": "ae",
+          "å": "a",
+          "Å": "a"
+          // ADD MORE HERE
+        };
+
+    var normalize = function( term ) {
+          var ret = "";
+          for ( var i = 0; i < term.length; i++ ) {
+            ret += accentMap[ term.charAt(i) ] || term.charAt(i);
+          }
+          return ret;
+        }
+
+
+ $("#text-entry").autocomplete({
+    source: function( request, response ) {
+        var matcher = new RegExp( $.ui.autocomplete.escapeRegex( request.term ), "i" );
+        response($.grep(stops_arr, function(value) {
+            return matcher.test(value.label) || matcher.test(normalize(value.label));
+            })
+        );
+    },select: function(event, ui) {
+        event.preventDefault();
+        $("#text-entry").val(ui.item.label);
+        current_stop = {'stop_id': ui.item.value, 'stop_name': ui.item.label};
+        fill_data();
+    },
+    focus: function(event, ui) {
+        event.preventDefault();
+        $("#text-entry").val(ui.item.label);
+    }
 });
 
 setInterval(format_time, 1000);
+});
+
