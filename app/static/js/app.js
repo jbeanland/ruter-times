@@ -1,3 +1,5 @@
+var allstops = null;
+
 
 $(function() {
 
@@ -247,9 +249,20 @@ var format_time = function () {
 
         if (localStorage.getItem('stops')) {
             data = JSON.parse(localStorage.getItem('stops'));
-            fillStopData(data);
-            get_favourites();
-            get_correct_fav_button();
+            // refresh memory if still only have tube stops
+            if (Object.keys(data).length < 200) {
+                $.getJSON('/GET/stops/', function (data) {
+                    localStorage.setItem('stops', JSON.stringify(data));
+                    fillStopData(data);
+                    get_favourites();
+                    get_correct_fav_button();
+
+                })
+            } else {
+                fillStopData(data);
+                get_favourites();
+                get_correct_fav_button();
+            }
         } else {
             $.getJSON('/GET/stops/', function (data) {
                 localStorage.setItem('stops', JSON.stringify(data));
