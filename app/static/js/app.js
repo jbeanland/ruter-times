@@ -304,7 +304,9 @@ var format_time = function () {
             return matcher.test(value.label) || matcher.test(normalize(value.label));
             })
         );
-    },select: function(event, ui) {
+    },
+    minLength: 3,
+    select: function(event, ui) {
         event.preventDefault();
         $("#text-entry").val(ui.item.label);
         current_stop = {'stop_id': ui.item.value, 'stop_name': ui.item.label};
