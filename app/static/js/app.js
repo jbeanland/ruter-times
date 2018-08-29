@@ -1,6 +1,3 @@
-var allstops = null;
-
-
 $(function() {
 
 var last_update = null;
